@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use std::os::unix::raw::off_t;
 use std::str::FromStr;
 use std::thread::spawn;
 
@@ -7,7 +6,7 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize, Discriminator};
 use anchor_lang::__private::base64;
 use clap::Parser;
 use crossbeam_channel::{Receiver, Sender, unbounded};
-use log::{debug, error, info, LevelFilter};
+use log::{debug, error, info, LevelFilter, warn};
 use serde::Serialize;
 use serde_json;
 use solana_account_decoder::UiAccountEncoding;
@@ -112,8 +111,8 @@ fn main() {
         match receiver.recv() {
             Ok(response) => {
                 // remove logs if contains
-                let any = response.value.logs.iter().any(|x|x.contains("error"));
-                if any {
+                if let Some(error) = response.value.err.as_ref() {
+                    // warn!("Skipping TX {:?} with error: {error:?}", response.value.signature);
                     continue;
                 }
                 for log in &response.value.logs{
