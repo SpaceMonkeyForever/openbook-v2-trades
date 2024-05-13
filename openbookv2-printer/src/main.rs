@@ -142,7 +142,7 @@ async fn main() {
             }
             fill_log.taker = maker_owner;
         }
-        let trade = Trade::new(&fill_log, &market, market_name.clone().replace("\0", ""));
+        let trade = Trade::new(&fill_log, &market, market_name.clone().replace("\0", ""), tx_hash.clone());
         let t = serde_json::to_string(&trade).unwrap();
         socket.send(&t, 0);
         info!("{:?}, signature: {}", t, tx_hash);
